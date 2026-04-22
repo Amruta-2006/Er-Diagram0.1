@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campus Placement Drive – ER Diagram</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Space+Grotesk:wght@300;400;600;700&display=swap');
+
+:root {
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --border: #d1d5db;
+
+  --entity: #e0f2fe;
+  --entity-border: #2563eb;
+
+  --weak-entity: #f3e8ff;
+  --weak-border: #7c3aed;
+
+  --relation: #dcfce7;
+  --relation-border: #16a34a;
+
+  --attr: #f1f5f9;
+  --attr-border: #64748b;
+
+  --pk-attr: #dcfce7;
+  --pk-border: #22c55e;
+
+  --derived-border: #f59e0b;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+
+  --text-entity: #1d4ed8;
+  --text-weak: #6d28d9;
+  --text-relation: #15803d;
+
+  --line: #334155;
+
+  --accent1: #2563eb;
+  --accent2: #7c3aed;
+  --accent3: #16a34a;
+}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+  header {
+    padding: 28px 40px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    background: linear-gradient(180deg, #0d1220 0%, var(--bg) 100%);
+  }
+
+  header h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #e2e8f0;
+    letter-spacing: -0.5px;
+  }
+
+  header span {
+    font-size: 11px;
+    color: var(--text-secondary);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding-bottom: 2px;
+  }
+
+  .legend {
+    display: flex;
+    gap: 24px;
+    padding: 14px 40px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+  }
+
+  .leg-box {
+    width: 18px; height: 12px;
+    border-radius: 2px;
+    border-width: 1.5px;
+    border-style: solid;
+  }
+  .leg-diamond {
+    width: 14px; height: 14px;
+    border-width: 1.5px;
+    border-style: solid;
+    transform: rotate(45deg);
+    border-radius: 1px;
+  }
+  .leg-oval {
+    width: 22px; height: 12px;
+    border-radius: 50%;
+    border-width: 1.5px;
+    border-style: solid;
+  }
+
+  .canvas-wrap {
+    padding: 30px 20px 40px;
+    overflow: auto;
+  }
+
+  svg {
+    display: block;
+    margin: 0 auto;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* Entity rectangle */
+  .entity-rect {
+    fill: var(--entity);
+    stroke: var(--entity-border);
+    stroke-width: 2;
+    rx: 4;
+  }
+  .weak-rect {
+    fill: var(--weak-entity);
+    stroke: var(--weak-border);
+    stroke-width: 2;
+    rx: 4;
+  }
+  .weak-rect-inner {
+    fill: none;
+    stroke: var(--weak-border);
+    stroke-width: 1;
+    rx: 2;
+  }
+
+  /* Relationship diamond */
+  .rel-diamond { fill: var(--relation); stroke: var(--relation-border); stroke-width: 1.8; }
+  .rel-diamond-id { fill: #0f1a12; stroke: #15803d; stroke-width: 2; }
+
+  /* Attribute ellipse */
+  .attr-ellipse { fill: var(--attr); stroke: var(--attr-border); stroke-width: 1.5; }
+  .pk-ellipse { fill: var(--pk-attr); stroke: var(--pk-border); stroke-width: 1.5; }
+  .derived-ellipse { fill: var(--attr); stroke: var(--derived-border); stroke-width: 1.5; stroke-dasharray: 4,2; }
+
+  /* Text */
+  .entity-label { font-size: 12px; font-weight: 600; fill: var(--text-entity); letter-spacing: 0.5px; }
+  .weak-label { font-size: 11px; font-weight: 600; fill: var(--text-weak); }
+  .rel-label { font-size: 10px; font-weight: 600; fill: var(--text-relation); letter-spacing: 0.3px; }
+  .attr-label { font-size: 9px; fill: #94a3b8; }
+  .pk-label { font-size: 9px; fill: #86efac; text-decoration: underline; }
+  .cardinality { font-size: 10px; fill: #f59e0b; font-weight: 600; }
+
+  /* Lines */
+  .connector { stroke: #334155; stroke-width: 1.5; fill: none; }
+  .double-connector { stroke: #7c3aed; stroke-width: 1.5; fill: none; }
+  .pk-underline { stroke: #22c55e; stroke-width: 1; fill: none; }
+
+  .glow-blue { filter: drop-shadow(0 0 3px rgba(37,99,235,0.2)); }
+.glow-purple { filter: drop-shadow(0 0 3px rgba(124,58,237,0.2)); }
+.glow-green { filter: drop-shadow(0 0 3px rgba(22,163,74,0.2)); }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Campus Placement Drive Management System</h1>
+    <span>Entity–Relationship Diagram &nbsp;·&nbsp; 9 Entities &nbsp;·&nbsp; 8 Relationships</span>
+  </div>
+</header>
+
+<div class="legend">
+  <div class="legend-item"><div class="leg-box" style="background:#0f1e3a;border-color:#2563eb"></div> Strong Entity</div>
+  <div class="legend-item"><div class="leg-box" style="background:#1a0f3a;border-color:#7c3aed"></div> Weak Entity</div>
+  <div class="legend-item"><div class="leg-diamond" style="background:#1a2a0f;border-color:#16a34a"></div> Relationship</div>
+  <div class="legend-item"><div class="leg-oval" style="background:#1a1a2e;border-color:#475569"></div> Attribute</div>
+  <div class="legend-item"><div class="leg-oval" style="background:#1a2e1a;border-color:#22c55e"></div> Primary Key</div>
+  <div class="legend-item"><div class="leg-oval" style="background:#1a1a2e;border-color:#f59e0b;border-style:dashed"></div> Derived Attr</div>
+  <div class="legend-item" style="gap:6px"><svg width="30" height="12"><line x1="0" y1="6" x2="30" y2="6" stroke="#334155" stroke-width="1.5"/></svg> Relationship Line</div>
+  <div class="legend-item" style="gap:6px"><svg width="30" height="12"><line x1="0" y1="4" x2="30" y2="4" stroke="#7c3aed" stroke-width="1.5"/><line x1="0" y1="8" x2="30" y2="8" stroke="#7c3aed" stroke-width="1.5"/></svg> Total Participation</div>
+</div>
+
+<div class="canvas-wrap">
+<svg width="1400" height="1080" viewBox="0 0 1400 1080">
+  <defs>
+    <marker id="arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#334155"/>
+    </marker>
+    <filter id="blur-bg" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="40" result="blur"/>
+    </filter>
+  </defs>
+
+  <!-- Background glow blobs -->
+  <ellipse cx="350" cy="300" rx="200" ry="150" fill="#1a3a6a" opacity="0.08" filter="url(#blur-bg)"/>
+  <ellipse cx="1050" cy="600" rx="200" ry="180" fill="#3a1a6a" opacity="0.08" filter="url(#blur-bg)"/>
+  <ellipse cx="700" cy="700" rx="180" ry="140" fill="#1a4a2a" opacity="0.07" filter="url(#blur-bg)"/>
+
+  <!-- ============================================================ -->
+  <!-- RELATIONSHIP LINES (drawn first, behind everything)          -->
+  <!-- ============================================================ -->
+
+  <!-- STUDENT ↔ HAS_APPLICATION ↔ APPLICATION -->
+  <line class="connector" x1="310" y1="190" x2="420" y2="380"/>
+  <line class="connector" x1="480" y1="380" x2="600" y2="310"/>
+
+  <!-- APPLICATION ↔ FOR_ROLE ↔ JOB_ROLE -->
+  <line class="connector" x1="640" y1="280" x2="700" y2="220"/>
+  <line class="connector" x1="760" y1="220" x2="860" y2="210"/>
+
+  <!-- JOB_ROLE ↔ OFFERED_BY ↔ COMPANY -->
+  <line class="connector" x1="1000" y1="210" x2="1080" y2="220"/>
+  <line class="connector" x1="1140" y1="220" x2="1200" y2="200"/>
+
+  <!-- COMPANY ↔ CONDUCTS ↔ PLACEMENT_DRIVE -->
+  <line class="connector" x1="1250" y1="240" x2="1230" y2="390"/>
+  <line class="connector" x1="1220" y1="450" x2="1190" y2="520"/>
+
+  <!-- PLACEMENT_DRIVE ↔ HAS_SLOT ↔ SLOT -->
+  <line class="connector" x1="1100" y1="540" x2="1020" y2="560"/>
+  <line class="connector" x1="960" y1="560" x2="880" y2="580"/>
+
+  <!-- SLOT ↔ ALLOCATED_TO ↔ SLOT_ALLOCATION -->
+  <line class="connector" x1="820" y1="610" x2="760" y2="670"/>
+  <line class="connector" x1="700" y1="670" x2="660" y2="690"/>
+
+  <!-- SLOT_ALLOCATION links to STUDENT -->
+  <line class="connector" x1="600" y1="710" x2="320" y2="530"/>
+
+  <!-- APPLICATION ↔ drive_id ↔ PLACEMENT_DRIVE -->
+  <line class="connector" x1="620" y1="340" x2="1150" y2="490" stroke-dasharray="5,3"/>
+
+  <!-- SHORTLIST ↔ student ↔ STUDENT -->
+  <line class="connector" x1="310" y1="270" x2="310" y2="760"/>
+
+  <!-- SHORTLIST ↔ role ↔ JOB_ROLE -->
+  <line class="connector" x1="420" y1="800" x2="930" y2="260"/>
+
+  <!-- RESULT ↔ student ↔ STUDENT -->
+  <line class="connector" x1="250" y1="290" x2="200" y2="870"/>
+
+  <!-- RESULT ↔ role_id ↔ JOB_ROLE -->
+  <line class="connector" x1="320" y1="900" x2="930" y2="270" stroke-dasharray="5,3"/>
+
+  <!-- RESULT ↔ drive_id ↔ PLACEMENT_DRIVE -->
+  <line class="connector" x1="380" y1="880" x2="1140" y2="510" stroke-dasharray="5,3"/>
+
+  <!-- APPLICATION ↔ student_id ↔ STUDENT (double line = total participation) -->
+  <line x1="311" y1="192" x2="422" y2="382" stroke="#7c3aed" stroke-width="1" opacity="0.6"/>
+  <line x1="307" y1="190" x2="418" y2="380" stroke="#7c3aed" stroke-width="1" opacity="0.6"/>
+
+  <!-- ============================================================ -->
+  <!-- ENTITIES                                                     -->
+  <!-- ============================================================ -->
+
+  <!-- ── STUDENT (center-left) ── -->
+  <g class="glow-blue">
+    <rect class="entity-rect" x="170" y="140" width="270" height="200" rx="5"/>
+    <text class="entity-label" x="305" y="168" text-anchor="middle">STUDENT</text>
+    <line x1="175" y1="175" x2="435" y2="175" stroke="#2563eb" stroke-width="1" opacity="0.4"/>
+  </g>
+  <!-- Student attributes (inline table style) -->
+  <text class="pk-label" x="195" y="198">🔑 student_id (PK)</text>
+  <text class="attr-label" x="195" y="215">name</text>
+  <text class="attr-label" x="195" y="230">email</text>
+  <text class="attr-label" x="195" y="245">phone</text>
+  <text class="attr-label" x="195" y="260">branch</text>
+  <text class="attr-label" x="195" y="275">cgpa</text>
+  <text class="attr-label" x="195" y="290">backlog_count</text>
+  <text class="attr-label" x="195" y="305">graduation_year</text>
+  <text class="attr-label" x="195" y="320">resume_link</text>
+
+  <!-- ── COMPANY (top-right) ── -->
+  <g class="glow-blue">
+    <rect class="entity-rect" x="1160" y="100" width="220" height="155" rx="5"/>
+    <text class="entity-label" x="1270" y="128" text-anchor="middle">COMPANY</text>
+    <line x1="1165" y1="135" x2="1375" y2="135" stroke="#2563eb" stroke-width="1" opacity="0.4"/>
+  </g>
+  <text class="pk-label" x="1180" y="158">🔑 company_id (PK)</text>
+  <text class="attr-label" x="1180" y="175">name</text>
+  <text class="attr-label" x="1180" y="190">industry</text>
+  <text class="attr-label" x="1180" y="205">location</text>
+  <text class="attr-label" x="1180" y="220">package_offered</text>
+  <text class="attr-label" x="1180" y="235">recruitment_type</text>
+
+  <!-- ── JOB_ROLE ── -->
+  <g class="glow-blue">
+    <rect class="entity-rect" x="860" y="140" width="220" height="170" rx="5"/>
+    <text class="entity-label" x="970" y="168" text-anchor="middle">JOB_ROLE</text>
+    <line x1="865" y1="175" x2="1075" y2="175" stroke="#2563eb" stroke-width="1" opacity="0.4"/>
+  </g>
+  <text class="pk-label" x="878" y="198">🔑 role_id (PK)</text>
+  <text class="attr-label" x="878" y="215">🔗 company_id (FK)</text>
+  <text class="attr-label" x="878" y="230">role_name</text>
+  <text class="attr-label" x="878" y="245">ctc</text>
+  <text class="attr-label" x="878" y="260">eligibility_cgpa</text>
+  <text class="attr-label" x="878" y="275">max_backlogs</text>
+  <text class="attr-label" x="878" y="290">job_location</text>
+
+  <!-- ── PLACEMENT_DRIVE ── -->
+  <g class="glow-blue">
+    <rect class="entity-rect" x="1080" y="390" width="230" height="150" rx="5"/>
+    <text class="entity-label" x="1195" y="418" text-anchor="middle">PLACEMENT_DRIVE</text>
+    <line x1="1085" y1="425" x2="1305" y2="425" stroke="#2563eb" stroke-width="1" opacity="0.4"/>
+  </g>
+  <text class="pk-label" x="1098" y="448">🔑 drive_id (PK)</text>
+  <text class="attr-label" x="1098" y="465">🔗 company_id (FK)</text>
+  <text class="attr-label" x="1098" y="480">drive_date</text>
+  <text class="attr-label" x="1098" y="495">registration_deadline</text>
+  <text class="attr-label" x="1098" y="510">venue</text>
+
+  <!-- ── APPLICATION ── -->
+  <g class="glow-blue">
+    <rect class="entity-rect" x="480" y="260" width="230" height="160" rx="5"/>
+    <text class="entity-label" x="595" y="288" text-anchor="middle">APPLICATION</text>
+    <line x1="485" y1="295" x2="705" y2="295" stroke="#2563eb" stroke-width="1" opacity="0.4"/>
+  </g>
+  <text class="pk-label" x="498" y="318">🔑 application_id (PK)</text>
+  <text class="attr-label" x="498" y="335">🔗 student_id (FK)</text>
+  <text class="attr-label" x="498" y="350">🔗 role_id (FK)</text>
+  <text class="attr-label" x="498" y="365">🔗 drive_id (FK)</text>
+  <text class="attr-label" x="498" y="380">application_status</text>
+  <text style="font-size:8px;fill:#64748b" x="498" y="393">(Applied/Shortlisted/Rejected/Selected)</text>
+
+  <!-- ── SLOT ── -->
+  <g class="glow-blue">
+    <rect class="entity-rect" x="750" y="500" width="210" height="150" rx="5"/>
+    <text class="entity-label" x="855" y="528" text-anchor="middle">SLOT</text>
+    <line x1="755" y1="535" x2="955" y2="535" stroke="#2563eb" stroke-width="1" opacity="0.4"/>
+  </g>
+  <text class="pk-label" x="768" y="558">🔑 slot_id (PK)</text>
+  <text class="attr-label" x="768" y="575">🔗 drive_id (FK)</text>
+  <text class="attr-label" x="768" y="590">start_time</text>
+  <text class="attr-label" x="768" y="605">end_time</text>
+  <text class="attr-label" x="768" y="620">round_type</text>
+  <text style="font-size:8px;fill:#64748b" x="768" y="633">(Aptitude/Technical/HR)</text>
+
+  <!-- ── SLOT_ALLOCATION ── -->
+  <g class="glow-blue">
+    <rect class="entity-rect" x="480" y="630" width="220" height="120" rx="5"/>
+    <text class="entity-label" x="590" y="658" text-anchor="middle">SLOT_ALLOCATION</text>
+    <line x1="485" y1="665" x2="695" y2="665" stroke="#2563eb" stroke-width="1" opacity="0.4"/>
+  </g>
+  <text class="pk-label" x="498" y="688">🔑 allocation_id (PK)</text>
+  <text class="attr-label" x="498" y="705">🔗 slot_id (FK)</text>
+  <text class="attr-label" x="498" y="720">🔗 student_id (FK)</text>
+  <text style="font-size:8px;fill:#f59e0b" x="498" y="736">⚡ Conflict Detection</text>
+
+  <!-- ── SHORTLIST (Weak entity) ── -->
+  <g class="glow-purple">
+    <rect class="weak-rect" x="220" y="730" width="220" height="120" rx="5"/>
+    <rect class="weak-rect-inner" x="225" y="735" width="210" height="110" rx="3"/>
+    <text class="weak-label" x="330" y="758" text-anchor="middle">SHORTLIST</text>
+    <line x1="225" y1="765" x2="435" y2="765" stroke="#7c3aed" stroke-width="1" opacity="0.4"/>
+  </g>
+  <text class="pk-label" x="240" y="788">🔑 shortlist_id (PK)</text>
+  <text class="attr-label" x="240" y="805">🔗 student_id (FK)</text>
+  <text class="attr-label" x="240" y="820">🔗 role_id (FK)</text>
+  <text class="attr-label" x="240" y="835">status</text>
+  <text style="font-size:8px;fill:#64748b" x="240" y="848">(Shortlisted/Rejected)</text>
+
+  <!-- ── RESULT ── -->
+  <g class="glow-blue">
+    <rect class="entity-rect" x="100" y="840" width="230" height="140" rx="5"/>
+    <text class="entity-label" x="215" y="868" text-anchor="middle">RESULT</text>
+    <line x1="105" y1="875" x2="325" y2="875" stroke="#2563eb" stroke-width="1" opacity="0.4"/>
+  </g>
+  <text class="pk-label" x="118" y="898">🔑 result_id (PK)</text>
+  <text class="attr-label" x="118" y="915">🔗 student_id (FK)</text>
+  <text class="attr-label" x="118" y="930">🔗 role_id (FK)</text>
+  <text class="attr-label" x="118" y="945">🔗 drive_id (FK)</text>
+  <text class="attr-label" x="118" y="960">final_status</text>
+  <text style="font-size:8px;fill:#64748b" x="118" y="973">(Selected/Rejected/Waitlisted)</text>
+
+  <!-- ============================================================ -->
+  <!-- RELATIONSHIP DIAMONDS                                        -->
+  <!-- ============================================================ -->
+
+  <!-- HAS_APPLICATION (STUDENT ↔ APPLICATION): diamond around (430,380) -->
+  <polygon class="rel-diamond" points="450,355 480,380 450,405 420,380" />
+  <text class="rel-label" x="450" y="383" text-anchor="middle" font-size="8">APPLIES</text>
+  <!-- Cardinalities -->
+  <text class="cardinality" x="390" y="360">M</text>
+  <text class="cardinality" x="490" y="360">1</text>
+
+  <!-- FOR_ROLE (APPLICATION ↔ JOB_ROLE): diamond around (730,220) -->
+  <polygon class="rel-diamond" points="750,195 780,220 750,245 720,220" />
+  <text class="rel-label" x="750" y="223" text-anchor="middle" font-size="8">FOR</text>
+  <text class="cardinality" x="690" y="210">M</text>
+  <text class="cardinality" x="792" y="210">1</text>
+
+  <!-- OFFERED_BY (JOB_ROLE ↔ COMPANY): diamond around (1090,220) -->
+  <polygon class="rel-diamond" points="1110,195 1140,220 1110,245 1080,220" />
+  <text class="rel-label" x="1110" y="218" text-anchor="middle" font-size="7.5">OFFERED_BY</text>
+  <text class="cardinality" x="1060" y="210">N</text>
+  <text class="cardinality" x="1152" y="210">1</text>
+
+  <!-- CONDUCTS (COMPANY ↔ PLACEMENT_DRIVE): diamond around (1230,420) -->
+  <polygon class="rel-diamond" points="1250,395 1280,420 1250,445 1220,420" />
+  <text class="rel-label" x="1250" y="418" text-anchor="middle" font-size="7.5">CONDUCTS</text>
+  <text class="cardinality" x="1263" y="275">1</text>
+  <text class="cardinality" x="1263" y="455">N</text>
+
+  <!-- HAS_SLOT (PLACEMENT_DRIVE ↔ SLOT): diamond around (1000,555) -->
+  <polygon class="rel-diamond" points="1020,530 1050,555 1020,580 990,555" />
+  <text class="rel-label" x="1020" y="553" text-anchor="middle" font-size="8">HAS_SLOT</text>
+  <text class="cardinality" x="1072" y="545">1</text>
+  <text class="cardinality" x="970" y="545">N</text>
+
+  <!-- ALLOCATED_TO (SLOT ↔ SLOT_ALLOCATION): diamond around (740,670) -->
+  <polygon class="rel-diamond" points="760,645 790,670 760,695 730,670" />
+  <text class="rel-label" x="760" y="668" text-anchor="middle" font-size="7">ALLOCATED</text>
+  <text class="cardinality" x="800" y="650">1</text>
+  <text class="cardinality" x="715" y="650">N</text>
+
+  <!-- ============================================================ -->
+  <!-- EXTRA ATTRIBUTE CALLOUTS (selected key ones as ovals)       -->
+  <!-- ============================================================ -->
+
+  <!-- STUDENT eligibility note -->
+  <ellipse class="derived-ellipse" cx="100" cy="200" rx="55" ry="20"/>
+  <text class="attr-label" x="100" y="204" text-anchor="middle" fill="#f59e0b">eligible?</text>
+  <line class="connector" x1="155" y1="200" x2="170" y2="200" stroke="#f59e0b" stroke-dasharray="3,2"/>
+
+  <!-- APPLICATION status note -->
+  <ellipse class="derived-ellipse" cx="490" cy="450" rx="55" ry="18"/>
+  <text class="attr-label" x="490" y="454" text-anchor="middle" fill="#f59e0b">status_flow</text>
+  <line class="connector" x1="545" y1="450" x2="600" y2="420" stroke="#f59e0b" stroke-dasharray="3,2"/>
+
+  <!-- ============================================================ -->
+  <!-- DB FEATURES ANNOTATION BOX                                  -->
+  <!-- ============================================================ -->
+  <rect x="900" y="700" width="440" height="210" rx="6" fill="#0d1320" stroke="#1e3a5f" stroke-width="1.5"/>
+  <text x="920" y="728" font-size="11" font-weight="600" fill="#60a5fa" font-family="Space Grotesk, sans-serif">DB Features Implemented</text>
+  <line x1="905" y1="735" x2="1330" y2="735" stroke="#1e3a5f" stroke-width="1"/>
+
+  <text x="920" y="760" font-size="9.5" fill="#94a3b8">📊  Views</text>
+  <text x="960" y="760" font-size="9" fill="#64748b">eligible_students_per_company, drive_applicants</text>
+
+  <text x="920" y="782" font-size="9.5" fill="#94a3b8">⚙️  Stored Procedures</text>
+  <text x="1010" y="782" font-size="9" fill="#64748b">shortlist_students(), detect_slot_conflict()</text>
+
+  <text x="920" y="804" font-size="9.5" fill="#94a3b8">🔍  Indexes</text>
+  <text x="962" y="804" font-size="9" fill="#64748b">student(cgpa, backlog_count), application(status)</text>
+
+  <text x="920" y="826" font-size="9.5" fill="#94a3b8">🔗  Joins</text>
+  <text x="952" y="826" font-size="9" fill="#64748b">Multi-table joins across 5+ entities for eligibility</text>
+
+  <text x="920" y="848" font-size="9.5" fill="#94a3b8">🚦  Constraints</text>
+  <text x="978" y="848" font-size="9" fill="#64748b">CHECK(cgpa), UNIQUE(slot+student), FK cascades</text>
+
+  <text x="920" y="870" font-size="9.5" fill="#94a3b8">⚡  Triggers</text>
+  <text x="958" y="870" font-size="9" fill="#64748b">Auto-update shortlist on application status change</text>
+
+  <text x="920" y="892" font-size="9.5" fill="#94a3b8">🗂️  Partitioning</text>
+  <text x="985" y="892" font-size="9" fill="#64748b">Result by graduation_year for performance</text>
+
+  <!-- ============================================================ -->
+  <!-- TITLE WATERMARK / DIAGRAM LABEL                             -->
+  <!-- ============================================================ -->
+  <text x="700" y="1060" text-anchor="middle" font-size="10" fill="#1e3a5f" font-family="IBM Plex Mono, monospace">
+    Campus Placement Drive Management System – ER Diagram
+  </text>
+
+  <!-- Cardinality labels on key relationships -->
+  <text class="cardinality" x="350" y="260">1</text>
+  <text class="cardinality" x="380" y="430">N</text>
+
+  <!-- SLOT CONFLICT note -->
+  <rect x="490" y="755" width="160" height="28" rx="4" fill="#1a1020" stroke="#7c3aed" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="570" y="774" text-anchor="middle" font-size="8.5" fill="#c4b5fd">⚡ Slot Conflict Detection</text>
+  <line x1="570" y1="755" x2="570" y2="750" stroke="#7c3aed" stroke-width="1" stroke-dasharray="2,2"/>
+
+</svg>
+</div>
+
+<div style="padding:16px 40px 30px; border-top:1px solid #1e2a45; background:#0d1220; display:flex; gap:32px; flex-wrap:wrap;">
+  <div>
+    <div style="font-size:10px;color:#475569;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Entities</div>
+    <div style="font-size:11px;color:#64748b;line-height:1.8">
+      STUDENT · COMPANY · JOB_ROLE<br>
+      PLACEMENT_DRIVE · APPLICATION<br>
+      SLOT · SLOT_ALLOCATION<br>
+      SHORTLIST · RESULT
+    </div>
+  </div>
+  <div>
+    <div style="font-size:10px;color:#475569;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Relationships</div>
+    <div style="font-size:11px;color:#64748b;line-height:1.8">
+      APPLIES (M:1) · FOR_ROLE (M:1)<br>
+      OFFERED_BY (N:1) · CONDUCTS (1:N)<br>
+      HAS_SLOT (1:N) · ALLOCATED_TO (1:N)<br>
+      SHORTLISTED · FINAL_RESULT
+    </div>
+  </div>
+  <div>
+    <div style="font-size:10px;color:#475569;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Key Features</div>
+    <div style="font-size:11px;color:#64748b;line-height:1.8">
+      CGPA &amp; Backlog eligibility filter<br>
+      Slot conflict detection<br>
+      Company-wise shortlisting<br>
+      Complex joins &amp; views
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
